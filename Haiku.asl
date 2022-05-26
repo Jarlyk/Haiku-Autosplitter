@@ -37,8 +37,8 @@ startup {
 	};
 	
 	settings.Add("startConditions", true, "Start Conditions");
-	settings.Add("onFileSelect", true, "On File Select", "startConditions");
-	settings.Add("onHaikuWake", false, "On Haiku Wake", "startConditions");	
+	settings.Add("onFileSelect", false, "On File Select", "startConditions");
+	settings.Add("onHaikuWake", true, "On Haiku Wake", "startConditions");	
 	
 	settings.Add("abilities", true, "Abilities");
 	settings.Add("bomb", true, "Bomb", "abilities");
@@ -66,7 +66,7 @@ startup {
 	settings.Add("boss9", false, "Big Brother", "bosses");
 	settings.Add("boss10", false, "Mischievous Mechanic", "bosses");
 	settings.Add("boss11", false, "Big Drill", "bosses");
-	settings.Add("boss12", true, "Car Battery", "bosses");
+	settings.Add("boss12", false, "Car Battery", "bosses");
 	settings.Add("boss13", false, "Door Boss", "bosses");
 	settings.Add("boss14", false, "Creator Trio", "bosses");
 	
@@ -90,9 +90,9 @@ startup {
 	for (int i=0; i < vars.transNames.Length; i++) {
 		vars.transNames[i] = vars.transFrom[i] + "_" + vars.transTo[i];
 	}
-	settings.Add("69_68", false, "Exit Car Battery", "transitions");
+	settings.Add("69_68", true, "Exit Car Battery", "transitions");
 	settings.Add("93_171", false, "Enter Factory Left", "transitions");
-	settings.Add("90_100", false, "Enter Factory Right", "transitions");	
+	settings.Add("90_100", true, "Enter Factory Right", "transitions");	
 	settings.Add("170_66", false, "Leave Quatern with Emitter", "transitions");
 
 	settings.Add("endings", true, "Endings");
