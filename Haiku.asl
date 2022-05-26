@@ -293,7 +293,7 @@ split {
 	
 	for (int i=0; i < vars.transFrom.Length; i++) {
 		var name = vars.transNames[i];
-		if (i == 3 && settings[name] && !vars.transDone[i] &&  && current.chips[9] && current.Scene == vars.transTo[i] && old.Scene == vars.transFrom[i]) {
+		if (i == 3 && settings[name] && !vars.transDone[i] && current.chips[9] && current.Scene == vars.transTo[i] && old.Scene == vars.transFrom[i]) {
 			vars.transDone[i] = true;
 			return true;
 		}
