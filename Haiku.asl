@@ -83,8 +83,8 @@ startup {
 	settings.Add("OnBuiltFragment", false, "Build Vial Fragment", "fragments");
 	
 	settings.Add("transitions", false, "Transitions");
-	vars.transFrom = new[] { 69, 93, 90 };
-	vars.transTo = new[] { 68, 171, 100 };
+	vars.transFrom = new[] { 69, 93, 90, 170};
+	vars.transTo = new[] { 68, 171, 100, 66};
 	vars.transNames = new string[vars.transFrom.Length];
 	vars.transDone = new bool[vars.transFrom.Length];
 	for (int i=0; i < vars.transNames.Length; i++) {
@@ -93,7 +93,8 @@ startup {
 	settings.Add("69_68", false, "Exit Car Battery", "transitions");
 	settings.Add("93_171", false, "Enter Factory Left", "transitions");
 	settings.Add("90_100", false, "Enter Factory Right", "transitions");	
-	
+	settings.Add("170_66", false, "Leave Quatern with Emitter", "transitions");
+
 	settings.Add("endings", true, "Endings");
 	settings.Add("ending_any", true, "Any% Ending", "endings");
 	settings.Add("ending_te", false, "True Ending", "endings");
@@ -292,6 +293,10 @@ split {
 	
 	for (int i=0; i < vars.transFrom.Length; i++) {
 		var name = vars.transNames[i];
+		if (i == 3 && current.chips[9] && !old.chips[i]) {
+			vars.transDone[i] = true;
+			return true;
+		}
 		if (settings[name] && !vars.transDone[i] && current.Scene == vars.transTo[i] && old.Scene == vars.transFrom[i]) {
 			vars.transDone[i] = true;
 			return true;
