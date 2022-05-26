@@ -42,8 +42,8 @@ startup {
 	
 	settings.Add("abilities", true, "Abilities");
 	settings.Add("bomb", true, "Bomb", "abilities");
-	settings.Add("dash", true, "Dash", "abilities");
-	settings.Add("doubleJump", true, "Double Jump", "abilities");
+	//settings.Add("dash", true, "Dash", "abilities");
+	settings.Add("doubleJump", false, "Double Jump", "abilities");
 	settings.Add("grapple", true, "Grapple", "abilities");
 	settings.Add("heal", false, "Wrench (Heal)", "abilities");
 	settings.Add("roll", true, "Ball", "abilities");
@@ -253,7 +253,7 @@ onStart {
 
 split {
 	if (settings["bomb"] && current.canBomb && !old.canBomb) return true;
-	if (settings["dash"] && current.canDash && !old.canDash) return true;
+	//if (settings["dash"] && current.canDash && !old.canDash) return true;
 	if (settings["doubleJump"] && current.canDoubleJump && !old.canDoubleJump) return true;
 	if (settings["grapple"] && current.canGrapple && !old.canGrapple) return true;
 	if (settings["heal"] && current.canHeal && !old.canHeal) return true;
