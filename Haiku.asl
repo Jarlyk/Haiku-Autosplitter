@@ -82,7 +82,7 @@ startup {
 	settings.Add("totalFragments", false, "Any Fragment", "fragments");
 	settings.Add("OnBuiltFragment", false, "Build Vial Fragment", "fragments");
 	
-	settings.Add("transitions", false, "Transitions");
+	settings.Add("transitions", true, "Transitions");
 	vars.transFrom = new[] { 69, 93, 90, 170};
 	vars.transTo = new[] { 68, 171, 100, 66};
 	vars.transNames = new string[vars.transFrom.Length];
