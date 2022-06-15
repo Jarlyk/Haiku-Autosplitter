@@ -3,6 +3,7 @@ state("Haiku") {}
 startup {
 	vars.Log = (Action<object>)(output => print("[] " + output));
     vars.Unity = Assembly.Load(File.ReadAllBytes(@"Components\UnityASL.bin")).CreateInstance("UnityASL.Unity");
+
 	vars.Unity.LoadSceneManager = true;
 	
 	vars.chips = new[] {
@@ -102,11 +103,12 @@ startup {
 
 init {
 	current.Scene = -1;
-	
+	current.loadingStarted = false;
+	current.loadingStartTime = 0;
+	current.clock = new Stopwatch();
     vars.Unity.TryOnLoad = (Func<dynamic, bool>)(helper =>
     {
         var gm = helper.GetClass("Assembly-CSharp", "GameManager");
-        
         vars.Unity.Make<bool>(gm.Static, gm["instance"], gm["gameLoaded"]).Name = "gameLoaded";
         vars.Unity.Make<bool>(gm.Static, gm["instance"], gm["canBomb"]).Name = "canBomb";
         vars.Unity.Make<bool>(gm.Static, gm["instance"], gm["canDash"]).Name = "canDash";
@@ -139,6 +141,17 @@ init {
         vars.Unity.Make<bool>(gm.Static, gm["instance"], gm["showCredits"]).Name = "showCredits";
         vars.Unity.Make<bool>(gm.Static, gm["instance"], gm["introPlayed"]).Name = "introPlayed";
         vars.Unity.Make<int>(gm.Static, gm["instance"], gm["savePointSceneIndex"]).Name = "savePointSceneIndex";
+
+		current.versionFieldExists = false;
+
+		for (int i = 0; i < gm.Fields.Count; i++) {
+			if (gm.Fields[i].Name == "speedrunnerBuildVersion") {
+				// The exact version number is not needed currently, but if it ever is then you can use this:
+				//vars.Unity.MakeString(gm.Static, gm["instance"], gm["speedrunnerBuildVersion"]).Name = "speedrunnerBuildVersion";
+				current.versionFieldExists = true;
+				break;
+			}
+		}
 		
 		
 		
@@ -164,6 +177,7 @@ init {
 		
 		var ps = helper.GetClass("Assembly-CSharp", "PlayerScript");
         vars.Unity.Make<bool>(ps.Static, ps["instance"], ps["disableControls"]).Name = "disableControls";
+		vars.Unity.Make<bool>(ps.Static, ps["instance"], ps["isDead"]).Name = "isDead";
 		
 		var cb = helper.GetClass("Assembly-CSharp", "CameraBehavior");
 		vars.Unity.Make<bool>(cb.Static, cb["instance"], cb["isTransitioning"]).Name = "isTransitioning";
@@ -230,6 +244,7 @@ update {
 	current.savePointSceneIndex = vars.Unity["savePointSceneIndex"].Current;
 	current.disableControls = vars.Unity["disableControls"].Current;
 	current.isTransitioning = vars.Unity["isTransitioning"].Current;
+	current.isDead = vars.Unity["isDead"].Current;
 	
 	var scId = vars.Unity.Scenes.Active.Index;
 	if (scId > 0)
@@ -242,7 +257,6 @@ start {
 		
 	if (settings["onHaikuWake"])
 		return (current.Scene == current.savePointSceneIndex) && !current.disableControls;
-		
 	return false;
 }
 
@@ -310,8 +324,30 @@ split {
 }
 
 isLoading {
-    if (!vars.Unity.Loaded) return false;
-	return vars.Unity.Scenes.Count > 1 && current.Scene != 144;
+	// Scene 8 is Main Menu
+    if (!vars.Unity.Loaded || current.Scene == 8) return false;
+	// Old Version of Haiku where Scenes were loaded twice, requiring a different autosplitter
+	// Scene 144 is the creator trio fight which loads an extra scene and thus breaks it
+	if (!current.versionFieldExists) {
+		return vars.Unity.Scenes.Count > 1 && current.Scene != 144;
+	}
+	// New version of Haiku (after 1.0.265) where Scenes are only loaded once
+	// The Camera is set to transitioning while getting hit by a hazard and while dying. Now a hazard respawn disables control while you're obviously not dead, so it returns false,
+	// if you die though then controls are disabled and thus load time gets removed
+	if (current.isTransitioning && current.disableControls == current.isDead) {
+		if (!current.loadingStarted) { 
+			current.loadingStarted = true;
+			current.clock.Start();
+		} else if (current.clock.ElapsedMilliseconds <= 400) {
+			return false;
+		} else {
+			return true;
+		}
+	} else if (current.loadingStarted) {
+		current.clock.Reset();
+		current.loadingStarted = false;
+	}
+	return false;
 }
 
 exit {
