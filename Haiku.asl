@@ -331,6 +331,10 @@ isLoading {
 	if (!current.versionFieldExists) {
 		return vars.Unity.Scenes.Count > 1 && current.Scene != 144;
 	}
+	
+	// Later versions still need special case for Trio fight
+	if (current.Scene == 144) return false;
+	
 	// New version of Haiku (after 1.0.265) where Scenes are only loaded once
 	// The Camera is set to transitioning while getting hit by a hazard and while dying. Now a hazard respawn disables control while you're obviously not dead, so it returns false,
 	// if you die though then controls are disabled and thus load time gets removed
