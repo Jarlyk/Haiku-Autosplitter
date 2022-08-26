@@ -24,7 +24,7 @@ startup {
 		"Protector's Capsule",
 		"Pocket Magnet",
 		"Self-Detonation",
-		"Tungestn Steel",
+		"Tungsten Steel",
 		"Nomad's Plate",
 		"Sawblade",
 		"Amplifying Transputer",
@@ -84,8 +84,8 @@ startup {
 	settings.Add("OnBuiltFragment", false, "Build Vial Fragment", "fragments");
 	
 	settings.Add("transitions", true, "Transitions");
-	vars.transFrom = new[] { 69, 93, 90, 170};
-	vars.transTo = new[] { 68, 171, 100, 66};
+	vars.transFrom = new[] { 69, 93, 90, 170, 69, 86, 62};
+	vars.transTo = new[] { 68, 171, 100, 66, 71, 87, 167};
 	vars.transNames = new string[vars.transFrom.Length];
 	vars.transDone = new bool[vars.transFrom.Length];
 	for (int i=0; i < vars.transNames.Length; i++) {
@@ -95,6 +95,15 @@ startup {
 	settings.Add("93_171", false, "Enter Factory Left", "transitions");
 	settings.Add("90_100", true, "Enter Factory Right", "transitions");	
 	settings.Add("170_66", false, "Leave Quatern with Emitter", "transitions");
+	settings.Add("69_71", false, "Enter Car Battery Save (Right)", "transitions");
+	settings.Add("86_87", false, "Enter Pinion Save", "transitions");
+	settings.Add("62_167", false, "Enter Mainframe Save", "transitions");
+	
+	vars.warpsDone = new bool[3];
+	settings.Add("deathWarps", false, "Death Warps");
+	settings.Add("bulbletWarp", false, "Bulblet Warp", "deathWarps");
+	settings.Add("electronWarp", false, "Electron Warp", "deathWarps");
+	settings.Add("protonWarp", false, "Proton Warp", "deathWarps");
 
 	settings.Add("endings", true, "Endings");
 	settings.Add("ending_any", true, "Any% Ending", "endings");
@@ -264,6 +273,9 @@ onStart {
 	for (int i=0; i < vars.transDone.Length; i++) {
 		vars.transDone[i] = false;
 	}
+	for (int i=0; i < vars.warpsDone.Length; i++) {
+		vars.warpsDone[i] = false;
+	}
 }
 
 split {
@@ -315,6 +327,19 @@ split {
 			vars.transDone[i] = true;
 			return true;
 		}
+	}
+	
+	if (settings["bulbletWarp"] && !vars.warpsDone[0] && current.Scene == 71 && current.lightBulb) {
+		vars.warpsDone[0] = true;
+		return true;
+	}
+	if (settings["electronWarp"] && !vars.warpsDone[1] && current.Scene == 71 && current.boss4) {
+		vars.warpsDone[1] = true;
+		return true;
+	}
+	if (settings["protonWarp"] && !vars.warpsDone[2] && current.Scene == 167 && current.boss5) {
+		vars.warpsDone[2] = true;
+		return true;
 	}
 	
 	if (settings["ending_any"] && current.showCredits && current.Scene == 3 && old.Scene != 3) return true;
